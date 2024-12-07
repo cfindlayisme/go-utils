@@ -1,0 +1,97 @@
+name: Publish Go Package
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  unit-test:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v4
+        - uses: actions/setup-go@v5
+          with:
+            go-version: '1.21.3'
+        - name: Install dependencies for go
+          run: go mod download
+        - name: Unit Testing
+          run: go test -v ./...
+        - name: Generate coverage report
+          run: go test -coverprofile=coverage.out ./...
+        - name: Upload coverage report
+          uses: actions/upload-artifact@v4
+          with:
+            name: coverage-report
+            path: coverage.out
+
+  nancy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: 1.22.3
+    - name: Check for Go vulnerabilities
+      run: |
+        go list -json -m all | docker run --rm -i sonatypecommunity/nancy:latest sleuth
+
+    
+  build-and-publish:
+    needs: [unit-test, nancy]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Increment version
+        id: version
+        run: |
+          # Get the latest tag
+          latest_tag=$(git describe --tags $(git rev-list --tags --max-count=1))
+          echo "Latest tag: $latest_tag"
+
+          # Parse the version (assumes semantic versioning)
+          major=$(echo $latest_tag | cut -d. -f1 | sed 's/v//')
+          minor=$(echo $latest_tag | cut -d. -f2)
+          patch=$(echo $latest_tag | cut -d. -f3)
+
+          # Increment the patch version
+          new_patch=$((patch + 1))
+          new_version="v$major.$minor.$new_patch"
+          echo "New version: $new_version"
+
+          # Set the new version as an output
+          echo "new_version=$new_version" >> $GITHUB_ENV
+
+      - name: Create and push new tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Create a new tag
+          git tag $GITHUB_ENV[new_version]
+
+          # Push the tag
+          git push origin $GITHUB_ENV[new_version]
+
+      - name: Build package
+        run: |
+          go build ./...
+
+      - name: Publish package
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Publishing package for version $GITHUB_ENV[new_version]"
+          go list ./... | while read -r pkg; do
+            GOPROXY=direct GOPRIVATE="*" go publish -v "$pkg" "https://github.com/${{ github.repository }}.git"
+          done
