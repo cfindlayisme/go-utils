@@ -39,6 +39,7 @@ jobs:
         go list -json -m all | docker run --rm -i sonatypecommunity/nancy:latest sleuth
     
   build-and-publish:
+    if: github.ref == 'refs/heads/main'
     needs: [unit-test, nancy]
     runs-on: ubuntu-latest
 
