@@ -37,7 +37,6 @@ jobs:
     - name: Check for Go vulnerabilities
       run: |
         go list -json -m all | docker run --rm -i sonatypecommunity/nancy:latest sleuth
-
     
   build-and-publish:
     needs: [unit-test, nancy]
