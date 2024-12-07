@@ -2,8 +2,6 @@ name: Publish Go Package
 
 on:
   push:
-    branches:
-      - main
 
 jobs:
 
