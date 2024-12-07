@@ -82,7 +82,7 @@ jobs:
 
           git push origin "$new_version"
 
-      - name: Build package
+      - name: Build package for sanity check
         run: |
           go build ./...
 
