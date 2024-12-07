@@ -73,7 +73,7 @@ jobs:
           # Set the new version as an output
           echo "new_version=$new_version" >> $GITHUB_ENV
 
-      - name: Create and push new tag
+      - name: Create and push new tag (publish)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -81,16 +81,3 @@ jobs:
           git tag "$new_version"
 
           git push origin "$new_version"
-
-      - name: Build package for sanity check
-        run: |
-          go build ./...
-
-      - name: Publish package
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Publishing package for version $GITHUB_ENV[new_version]"
-          go list ./... | while read -r pkg; do
-            GOPROXY=direct GOPRIVATE="*" go publish -v "$pkg" "https://github.com/${{ github.repository }}.git"
-          done
