@@ -78,11 +78,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Create a new tag
-          git tag $GITHUB_ENV[new_version]
+          git tag "$new_version"
 
-          # Push the tag
-          git push origin $GITHUB_ENV[new_version]
+          git push origin "$new_version"
 
       - name: Build package
         run: |
