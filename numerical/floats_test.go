@@ -1,6 +1,10 @@
-package numerical
+package numerical_test
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/cfindlayisme/go-utils/numerical"
+)
 
 func TestAlmostEqualFloats(t *testing.T) {
 	tests := []struct {
@@ -19,7 +23,7 @@ func TestAlmostEqualFloats(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if got := almostEqualFloats(test.a, test.b, test.epsilon); got != test.expected {
+		if got := numerical.AlmostEqualFloats(test.a, test.b, test.epsilon); got != test.expected {
 			t.Errorf("almostEqualFloats(%v, %v, %v) = %v, want %v", test.a, test.b, test.epsilon, got, test.expected)
 		}
 	}
