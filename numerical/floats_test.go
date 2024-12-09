@@ -20,7 +20,7 @@ func TestAlmostEqualFloats(t *testing.T) {
 
 	for _, test := range tests {
 		if got := almostEqualFloats(test.a, test.b, test.epsilon); got != test.expected {
-			t.Errorf("almostEqual(%v, %v, %v) = %v, want %v", test.a, test.b, test.epsilon, got, test.expected)
+			t.Errorf("almostEqualFloats(%v, %v, %v) = %v, want %v", test.a, test.b, test.epsilon, got, test.expected)
 		}
 	}
 }
