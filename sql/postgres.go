@@ -1,6 +1,7 @@
 package sql
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 
@@ -26,4 +27,8 @@ func GetPostgresConnectionDetails() models.PostgresConnectionDetails {
 	}
 
 	return details
+}
+
+func ConstructPostgresConnectionString(connectionDetails models.PostgresConnectionDetails, database string) string {
+	return "postgres://" + connectionDetails.Host + ":" + connectionDetails.Password + "@" + connectionDetails.Host + ":" + fmt.Sprintf("%d", connectionDetails.Port) + "/" + database
 }
