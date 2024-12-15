@@ -30,5 +30,5 @@ func GetPostgresConnectionDetails() models.PostgresConnectionDetails {
 }
 
 func ConstructPostgresConnectionString(connectionDetails models.PostgresConnectionDetails, database string) string {
-	return "postgres://" + connectionDetails.Host + ":" + connectionDetails.Password + "@" + connectionDetails.Host + ":" + fmt.Sprintf("%d", connectionDetails.Port) + "/" + database
+	return "postgres://" + connectionDetails.Username + ":" + connectionDetails.Password + "@" + connectionDetails.Host + ":" + fmt.Sprintf("%d", connectionDetails.Port) + "/" + database
 }
